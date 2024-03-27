@@ -1,0 +1,41 @@
+{
+    "name": "rukavishnikov/php-basic-app",
+    "type": "project",
+    "description": "A PHP basic application implemented PSR (PHP Standards Recommendations)",
+    "keywords": [
+        "php",
+        "psr",
+        "psr-1",
+        "psr-3",
+        "psr-4",
+        "psr-7",
+        "psr-11",
+        "psr-12",
+        "psr-15",
+        "basic",
+        "application"
+    ],
+    "homepage": "https://github.com/Ilya-Ruk/php-basic-app",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ilya Rukavishnikov",
+            "email": "ilya-ndt@mail.ru"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "psr/http-server-handler": "^1.0",
+        "rukavishnikov/php-emitter": "^0.1.0",
+        "rukavishnikov/php-helper-classes": "^0.1.0",
+        "rukavishnikov/php-router": "^0.1.0",
+        "rukavishnikov/psr-container": "^0.1.0",
+        "rukavishnikov/psr-http-message": "^0.1.0",
+        "rukavishnikov/psr-log": "^0.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rukavishnikov\\Php\\Basic\\App\\": "src/"
+        }
+    }
+}
