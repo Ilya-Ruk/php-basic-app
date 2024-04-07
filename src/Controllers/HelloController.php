@@ -34,16 +34,15 @@ final class HelloController implements RequestHandlerInterface
 
         // Log
 
+        $message = "Hello, {name} ({id})! IP: {ip}\r\n";
+
         $context = [
-            'ip' => $request->getServerParam('REMOTE_ADDR'),
             'name' => $name,
+            'id' => $id,
+            'ip' => $request->getServerParam('REMOTE_ADDR'),
         ];
 
-        if (!is_null($id)) {
-            $context['id'] = $id;
-        }
-
-        $this->log->info('Hello', $context);
+        $this->log->info($message, $context);
 
         // Prepare response
 
