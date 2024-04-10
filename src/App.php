@@ -10,6 +10,7 @@ use Rukavishnikov\Php\Emitter\EmitterInterface;
 use Rukavishnikov\Php\Router\RouterInterface;
 use Rukavishnikov\Psr\Container\Container;
 use Rukavishnikov\Psr\Http\Message\ServerRequest;
+use RuntimeException;
 use Throwable;
 
 final class App
@@ -50,6 +51,10 @@ final class App
      */
     public static function getContainer(): Container
     {
+        if (!isset(self::$container)) {
+            throw new RuntimeException('Container not defined!', 500);
+        }
+
         return self::$container;
     }
 
