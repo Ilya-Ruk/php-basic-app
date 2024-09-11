@@ -39,8 +39,22 @@ final class App
      */
     public static function create(Container $container): App
     {
+        if (isset(self::$instance)) {
+            throw new RuntimeException('Application already created!', 500);
+        }
+
+        self::$instance = new App($container);
+
+        return self::$instance;
+    }
+
+    /**
+     * @return App
+     */
+    public static function get(): App
+    {
         if (!isset(self::$instance)) {
-            self::$instance = new App($container);
+            throw new RuntimeException('Application not defined!', 500);
         }
 
         return self::$instance;
