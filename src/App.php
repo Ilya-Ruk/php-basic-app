@@ -118,8 +118,16 @@ final class App
 
             echo $e->getMessage();
 
-            if ($e->getPrevious() !== null) {
-                echo "\r\n\r\n" . $e->getPrevious()->getMessage();
+            $previousError = $e->getPrevious();
+
+            $errorLevel = 1;
+
+            while ($previousError !== null) {
+                echo "\r\n\r\n" . $errorLevel . ': ' . $previousError->getMessage();
+
+                $previousError = $previousError->getPrevious();
+
+                $errorLevel++;
             }
         }
     }
