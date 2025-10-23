@@ -33,6 +33,11 @@ final class App
         self::$container = $container;
     }
 
+    private function __clone(): void
+    {
+        // Nothing
+    }
+
     /**
      * @param Container $container
      * @return App
