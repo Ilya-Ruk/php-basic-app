@@ -20,6 +20,8 @@ use Rukavishnikov\Psr\Log\Log;
 use Rukavishnikov\Psr\Log\LogTargetFile;
 use Rukavishnikov\Psr\Log\LogTargetInterface;
 
+$startDateTime = new DateTime();
+
 return [
     ServerRequestInterface::class => ServerRequest::class,
     RouterInterface::class => [
@@ -30,7 +32,6 @@ return [
             ],
         ],
     ],
-    HelloController::class => HelloController::class,
     ResponseInterface::class => Response::class,
     LoggerInterface::class => Log::class,
     LogTargetInterface::class => [
@@ -42,8 +43,9 @@ return [
     FormatterInterface::class => [
         'class' => DefaultFormatter::class,
         '__construct()' => [
-            static fn () => new ValueToStringHelper(),
-            static fn () => new DateTime(),
+            ValueToStringHelper::class,
+            $startDateTime,
+            //'Y-m-d H:i:s',
         ],
     ],
     EmitterInterface::class => Emitter::class,

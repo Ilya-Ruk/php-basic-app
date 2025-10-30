@@ -29,7 +29,7 @@
         "rukavishnikov/php-emitter": "^0.1",
         "rukavishnikov/php-helper-classes": "^0.1",
         "rukavishnikov/php-router": "^0.1",
-        "rukavishnikov/psr-container": "^0.1",
+        "rukavishnikov/psr-container": "^0.2",
         "rukavishnikov/psr-http-message": "^0.1",
         "rukavishnikov/psr-log": "^0.1"
     },
