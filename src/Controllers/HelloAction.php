@@ -7,23 +7,22 @@ namespace Rukavishnikov\Php\Basic\App\Controllers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
+use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
-final class HelloController implements RequestHandlerInterface
+final class HelloAction implements RequestHandlerInterface
 {
     /**
+     * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
-     * @param LoggerInterface $log
      */
     public function __construct(
+        private JsonHelper $jsonHelper,
         private ResponseInterface $response,
-        private LoggerInterface $log,
     ) {
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * @inheritDoc
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -32,28 +31,15 @@ final class HelloController implements RequestHandlerInterface
         $name = $request->getAttribute('name', 'World');
         $id = $request->getAttribute('id');
 
-        // Log
-
-        $message = "Hello, {name} ({id})! IP: {ip}\r\n";
-
-        $context = [
-            'name' => $name,
-            'id' => $id,
-            'ip' => $request->getServerParam('REMOTE_ADDR'),
-        ];
-
-        $this->log->info($message, $context);
-
         // Prepare response
 
-        $fullName = $name;
-
-        if (!is_null($id)) {
-            $fullName .= ' (' . $id . ')';
+        if (is_null($id)) {
+            $body = sprintf("Hello, %s!", $name);
+        } else {
+            $body = sprintf("Hello, %s (%s)!", $name, $id);
         }
 
-        $body = sprintf("Hello, %s!", $fullName);
-
+        $body = $this->jsonHelper->encode($body);
         $this->response->getBody()->write($body);
 
         // Return response
