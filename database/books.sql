@@ -1,0 +1,7 @@
+CREATE TABLE "books" (
+	"id" INTEGER NOT NULL,
+	"author" VARCHAR(100) NOT NULL,
+	"title" VARCHAR(200) NOT NULL,
+	"year" INTEGER NOT NULL,
+	PRIMARY KEY ("id")
+)
