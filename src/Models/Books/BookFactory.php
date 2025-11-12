@@ -19,7 +19,7 @@ final class BookFactory
         return new Book(
             new BookAuthor($data['author'] ?? ''),
             new BookTitle($data['title'] ?? ''),
-            new BookYear((int)$data['year'] ?? 0)
+            new BookYear((int)($data['year'] ?? 0))
         );
     }
 }
