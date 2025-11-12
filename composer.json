@@ -25,10 +25,12 @@
     ],
     "require": {
         "php": ">=8.0",
+        "ext-pdo": "*",
         "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
         "rukavishnikov/php-emitter": "^0.1",
         "rukavishnikov/php-helper-classes": "^0.1",
-        "rukavishnikov/php-router": "^0.1",
+        "rukavishnikov/php-router": "^0.2",
         "rukavishnikov/psr-container": "^0.2",
         "rukavishnikov/psr-http-message": "^0.1",
         "rukavishnikov/psr-log": "^0.1"
