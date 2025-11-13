@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Rukavishnikov\Php\Basic\App\Controllers\Books;
+namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Models\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
-final class ListAction implements RequestHandlerInterface
+final class EditAction implements RequestHandlerInterface
 {
     /**
      * @param BookRepositoryInterface $bookRepository
@@ -29,13 +30,12 @@ final class ListAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $bookList = $this->bookRepository->getAll();
+        $id = (int)$request->getAttribute('id', 0);
+        $book = BookFactory::createFromArray($request->getParsedBody());
 
-        $data = [];
+        $this->bookRepository->edit($id, $book);
 
-        foreach ($bookList as $id => $book) {
-            $data[$id] = $book->getAsArray();
-        }
+        $data[$id] = "Book updated!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

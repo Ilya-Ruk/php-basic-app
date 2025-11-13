@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Rukavishnikov\Php\Basic\App\Controllers\Books;
+namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

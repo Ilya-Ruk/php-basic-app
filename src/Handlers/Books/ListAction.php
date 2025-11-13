@@ -2,20 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Rukavishnikov\Php\Basic\App\Controllers;
+namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
-final class HelloAction implements RequestHandlerInterface
+final class ListAction implements RequestHandlerInterface
 {
     /**
+     * @param BookRepositoryInterface $bookRepository
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
      */
     public function __construct(
+        private BookRepositoryInterface $bookRepository,
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
     ) {
@@ -26,23 +29,16 @@ final class HelloAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get request params (attributes)
+        $bookList = $this->bookRepository->getAll();
 
-        $name = $request->getAttribute('name', 'World');
-        $id = $request->getAttribute('id');
+        $data = [];
 
-        // Prepare response
-
-        if (is_null($id)) {
-            $body = sprintf("Hello, %s!", $name);
-        } else {
-            $body = sprintf("Hello, %s (%s)!", $name, $id);
+        foreach ($bookList as $id => $book) {
+            $data[$id] = $book->getAsArray();
         }
 
-        $body = $this->jsonHelper->encode($body);
+        $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
-
-        // Return response
 
         return $this->response;
     }

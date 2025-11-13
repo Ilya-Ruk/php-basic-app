@@ -2,24 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Rukavishnikov\Php\Basic\App\Controllers\Books;
+namespace Rukavishnikov\Php\Basic\App\Handlers;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Models\Books\BookFactory;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
-final class AddAction implements RequestHandlerInterface
+final class HelloAction implements RequestHandlerInterface
 {
     /**
-     * @param BookRepositoryInterface $bookRepository
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
      */
     public function __construct(
-        private BookRepositoryInterface $bookRepository,
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
     ) {
@@ -30,14 +26,23 @@ final class AddAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $book = BookFactory::createFromArray($request->getParsedBody());
+        // Get request params (attributes)
 
-        $id = $this->bookRepository->add($book);
+        $name = $request->getAttribute('name', 'World');
+        $id = $request->getAttribute('id');
 
-        $data[$id] = "Book inserted!";
+        // Prepare response
 
-        $body = $this->jsonHelper->encode($data);
+        if (is_null($id)) {
+            $body = sprintf("Hello, %s!", $name);
+        } else {
+            $body = sprintf("Hello, %s (%s)!", $name, $id);
+        }
+
+        $body = $this->jsonHelper->encode($body);
         $this->response->getBody()->write($body);
+
+        // Return response
 
         return $this->response;
     }
