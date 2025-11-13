@@ -25,22 +25,17 @@ final class BodyParamsMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!is_null($request->getParsedBody())) {
-            return $handler->handle($request);
-        }
-
-        $parsedBody = null;
-
         if ($request->hasHeader('Content-Type')) {
             $contentType = $request->getHeaderLine('Content-Type');
 
             if (preg_match('~^application/json.*$~i',$contentType) === 1) {
                 $body = $request->getBody()->getContents();
-
                 $parsedBody = $this->jsonHelper->decode($body, true);
+
+                return $handler->handle($request->withParsedBody($parsedBody));
             }
         }
 
-        return $handler->handle($request->withParsedBody($parsedBody));
+        return $handler->handle($request);
     }
 }
