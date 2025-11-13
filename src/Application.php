@@ -6,6 +6,7 @@ namespace Rukavishnikov\Php\Basic\App;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -50,9 +51,9 @@ final class Application implements ApplicationInterface
     /**
      * @inheritDoc
      *
-     * @throws NotFoundException
      * @throws ContainerExceptionInterface
-     * @throws \Rukavishnikov\Psr\Container\NotFoundException
+     * @throws NotFoundExceptionInterface
+     * @throws NotFoundException
      */
     public function run(): void
     {
