@@ -2,14 +2,20 @@
 
 declare(strict_types=1);
 
-use Rukavishnikov\Php\Basic\App\App;
+use Rukavishnikov\Php\Basic\App\ApplicationInterface;
+use Rukavishnikov\Php\Basic\App\ApplicationErrorHandler;
 use Rukavishnikov\Psr\Container\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+set_exception_handler([ApplicationErrorHandler::class, 'exceptionHandler']);
+set_error_handler([ApplicationErrorHandler::class, 'errorHandler']);
 
 $config = require __DIR__ . '/../config/config.php';
 
 $container = new Container($config);
 
-$app = App::create($container);
+/** @var ApplicationInterface $app */
+$app = $container->get(ApplicationInterface::class);
+
 $app->run();
