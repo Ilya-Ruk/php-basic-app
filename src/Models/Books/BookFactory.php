@@ -16,6 +16,8 @@ final class BookFactory
      */
     public static function createFromArray(array $data): Book
     {
+        $data = array_change_key_case($data);
+
         return new Book(
             new BookAuthor($data['author'] ?? ''),
             new BookTitle($data['title'] ?? ''),
