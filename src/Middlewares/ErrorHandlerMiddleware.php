@@ -16,12 +16,14 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
     /**
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
-     * @param bool $debugMode
+     * @param bool $debug
+     * @param bool $trace
      */
     public function __construct(
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
-        private bool $debugMode = false,
+        private bool $debug = false,
+        private bool $trace = false,
     ) {
     }
 
@@ -33,14 +35,23 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
         try {
             $response = $handler->handle($request);
         } catch (Throwable $e) {
-            $response = $this->response->withStatus($e->getCode());
+            $code = $e->getCode();
+
+            if ($code >= 400 && $code <= 599) { // Client error or server error
+                $responseCode = $code;
+            } else {
+                $responseCode = 500;
+            }
+
+            $response = $this->response->withStatus($responseCode)
+                ->withHeader('Content-Type', 'application/json; charset=utf-8');
 
             $data = [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage(),
             ];
 
-            if ($this->debugMode) {
+            if ($this->debug) {
                 $data['file'] = $e->getFile();
                 $data['line'] = $e->getLine();
 
@@ -61,7 +72,9 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
                     $errorLevel++;
                 }
 
-                $data['trace'] = $e->getTrace();
+                if ($this->trace) {
+                    $data['trace'] = $e->getTrace();
+                }
             }
 
             $body = $this->jsonHelper->encode($data);
@@ -72,8 +85,6 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
             if (!is_null($size)) {
                 $response = $response->withHeader('Content-Length', (string)$size);
             }
-
-            return $response->withHeader('Content-Type', 'application/json; charset=utf-8');
         }
 
         return $response;
