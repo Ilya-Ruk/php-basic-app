@@ -28,7 +28,7 @@ final class BodyParamsMiddleware implements MiddlewareInterface
         if ($request->hasHeader('Content-Type')) {
             $contentType = $request->getHeaderLine('Content-Type');
 
-            if (preg_match('~^application/json.*$~i',$contentType) === 1) {
+            if (preg_match('~^application/json.*$~i', $contentType) === 1) {
                 $body = $request->getBody()->getContents();
                 $parsedBody = $this->jsonHelper->decode($body, true);
 
