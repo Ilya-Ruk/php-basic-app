@@ -69,7 +69,7 @@ return [
                 new Route('GET', '/books', ListAction::class),
                 new Route('GET', '/books/{id:\d+}', ViewAction::class),
                 new Route('POST', '/books/add', AddAction::class),
-                new Route('PATCH', '/books/edit/{id:\d+}', EditAction::class),
+                new Route('PUT', '/books/edit/{id:\d+}', EditAction::class),
                 new Route('DELETE', '/books/delete/{id:\d+}', DeleteAction::class),
             ],
         ],
