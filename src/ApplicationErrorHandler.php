@@ -13,7 +13,7 @@ final class ApplicationErrorHandler
      * @var string[]
      */
     private static array $reasonPhraseList = [
-        // Client errors
+        // 4xx (Client Error)
         400 => 'Bad Request',
         401 => 'Unauthorized',
         402 => 'Payment Required',
@@ -27,14 +27,16 @@ final class ApplicationErrorHandler
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Payload Too Large', // Content Too Large
+        413 => 'Content Too Large',
         414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
         416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
-        429 => 'Too Many Requests',
+        421 => 'Misdirected Request',
+        422 => 'Unprocessable Content',
+        426 => 'Upgrade Required',
 
-        // Server errors
+        // 5xx (Server Error)
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
