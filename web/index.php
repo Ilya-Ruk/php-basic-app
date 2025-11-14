@@ -8,6 +8,9 @@ use Rukavishnikov\Psr\Container\Container;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+//putenv('X_DEBUG=true'); // Disable for production!
+//putenv('X_TRACE=true'); // Disable for production!
+
 set_exception_handler([ApplicationErrorHandler::class, 'exceptionHandler']);
 set_error_handler([ApplicationErrorHandler::class, 'errorHandler']);
 
