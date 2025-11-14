@@ -39,6 +39,6 @@ final class AddAction implements RequestHandlerInterface
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
 
-        return $this->response;
+        return $this->response->withStatus(201); // Created
     }
 }
