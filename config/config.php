@@ -20,13 +20,11 @@ use Rukavishnikov\Php\Basic\App\Middlewares\AccessLoggerMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\BodyParamsMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentLengthMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentTypeMiddleware;
-use Rukavishnikov\Php\Basic\App\Middlewares\ErrorHandlerMiddleware;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\SQLiteBookRepository;
 use Rukavishnikov\Php\Emitter\Emitter;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
 use Rukavishnikov\Php\Helper\Classes\FilePath;
-use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 use Rukavishnikov\Php\Helper\Classes\ValueToStringHelper;
 use Rukavishnikov\Php\Router\Route;
 use Rukavishnikov\Php\Router\Router;
@@ -38,9 +36,6 @@ use Rukavishnikov\Psr\Log\Formatter\FormatterInterface;
 use Rukavishnikov\Psr\Log\Log;
 use Rukavishnikov\Psr\Log\LogTargetFile;
 use Rukavishnikov\Psr\Log\LogTargetInterface;
-
-$debug = false;
-$trace = false; // Only used when debug is enabled
 
 $startDateTime = new DateTime();
 
@@ -54,14 +49,12 @@ return [
 
         'setMiddlewareList()' => [
             static fn (ContainerInterface $container) => [
-                $container->get(ErrorHandlerMiddleware::class), // Error handler must be first for catch all exceptions
+                $container->get(ContentLengthMiddleware::class), // Add Content-Length header to response
+                $container->get(ContentTypeMiddleware::class), // Add Content-Type header to response
 
-                $container->get(BodyParamsMiddleware::class),
+                $container->get(AccessLoggerMiddleware::class), // Write access log
 
-                $container->get(AccessLoggerMiddleware::class),
-
-                $container->get(ContentLengthMiddleware::class),
-                $container->get(ContentTypeMiddleware::class),
+                $container->get(BodyParamsMiddleware::class), // Decode request body (JSON)
             ],
         ],
     ],
@@ -105,16 +98,6 @@ return [
         '__construct()' => [
             ValueToStringHelper::class,
             $startDateTime,
-        ],
-    ],
-    ErrorHandlerMiddleware::class => [
-        'class' => ErrorHandlerMiddleware::class,
-
-        '__construct()' => [
-            JsonHelper::class,
-            new Response(), // Create new instance for error handler response
-            $debug,
-            $trace,
         ],
     ],
 ];
