@@ -17,7 +17,7 @@ use Rukavishnikov\Php\Basic\App\Handlers\Books\ListAction;
 use Rukavishnikov\Php\Basic\App\Handlers\Books\ViewAction;
 use Rukavishnikov\Php\Basic\App\Handlers\HelloAction;
 use Rukavishnikov\Php\Basic\App\Middlewares\AccessLoggerMiddleware;
-use Rukavishnikov\Php\Basic\App\Middlewares\BodyParamsMiddleware;
+use Rukavishnikov\Php\Basic\App\Middlewares\ApplicationJsonMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentLengthMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentTypeMiddleware;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
@@ -54,7 +54,7 @@ return [
 
                 $container->get(AccessLoggerMiddleware::class), // Write access log
 
-                $container->get(BodyParamsMiddleware::class), // Decode request body (JSON)
+                $container->get(ApplicationJsonMiddleware::class), // Decode request body (JSON)
             ],
         ],
     ],

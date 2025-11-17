@@ -10,7 +10,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
-final class BodyParamsMiddleware implements MiddlewareInterface
+final class ApplicationJsonMiddleware implements MiddlewareInterface
 {
     /**
      * @param JsonHelper $jsonHelper
