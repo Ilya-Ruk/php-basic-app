@@ -14,7 +14,7 @@ final class BookTitle
     /**
      * @param string $title
      */
-    public function __construct(private string $title)
+    private function __construct(private string $title)
     {
         if (strlen($this->title) < self::MIN_LENGTH) {
             throw new InvalidArgumentException(sprintf("Title length must be greater or equal of %d char!", self::MIN_LENGTH), 400);
@@ -23,6 +23,15 @@ final class BookTitle
         if (strlen($this->title) > self::MAX_LENGTH) {
             throw new InvalidArgumentException(sprintf("Title length must be less or equal of %d chars!", self::MAX_LENGTH), 400);
         }
+    }
+
+    /**
+     * @param string $title
+     * @return BookTitle
+     */
+    public static function createFromString(string $title): BookTitle
+    {
+        return new BookTitle($title);
     }
 
     /**

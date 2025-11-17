@@ -13,7 +13,7 @@ final class BookYear
     /**
      * @param int $year
      */
-    public function __construct(private int $year)
+    private function __construct(private int $year)
     {
         if ($this->year < self::MIN_YEAR) {
             throw new InvalidArgumentException(sprintf("Year must be greater or equal of %d!", self::MIN_YEAR), 400);
@@ -24,6 +24,24 @@ final class BookYear
         if ($this->year > $maxYear) {
             throw new InvalidArgumentException(sprintf("Year must be less or equal of %d!", $maxYear), 400);
         }
+    }
+
+    /**
+     * @param int $year
+     * @return BookYear
+     */
+    public static function createFromInt(int $year): BookYear
+    {
+        return new BookYear($year);
+    }
+
+    /**
+     * @param string $year
+     * @return BookYear
+     */
+    public static function createFromString(string $year): BookYear
+    {
+        return new BookYear((int)$year);
     }
 
     /**

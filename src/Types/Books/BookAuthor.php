@@ -14,7 +14,7 @@ final class BookAuthor
     /**
      * @param string $author
      */
-    public function __construct(private string $author)
+    private function __construct(private string $author)
     {
         if (strlen($this->author) < self::MIN_LENGTH) {
             throw new InvalidArgumentException(sprintf("Author name length must be greater or equal of %d char!", self::MIN_LENGTH), 400);
@@ -23,6 +23,15 @@ final class BookAuthor
         if (strlen($this->author) > self::MAX_LENGTH) {
             throw new InvalidArgumentException(sprintf("Author name must be less or equal of %d chars!", self::MAX_LENGTH), 400);
         }
+    }
+
+    /**
+     * @param string $author
+     * @return BookAuthor
+     */
+    public static function createFromString(string $author): BookAuthor
+    {
+        return new BookAuthor($author);
     }
 
     /**
