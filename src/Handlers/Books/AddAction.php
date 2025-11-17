@@ -7,7 +7,7 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Models\Books\BookFactory;
+use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
@@ -30,11 +30,13 @@ final class AddAction implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $book = BookFactory::createFromArray($request->getParsedBody());
+        $book = BookFactory::createFromRequestData($request->getParsedBody());
 
-        $id = $this->bookRepository->add($book);
+        $nextBookId = $this->bookRepository->getNextId();
 
-        $data[$id] = "Book inserted!";
+        $this->bookRepository->add($book->withId($nextBookId));
+
+        $data[$nextBookId] = "Book inserted!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

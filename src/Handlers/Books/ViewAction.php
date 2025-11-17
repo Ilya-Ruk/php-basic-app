@@ -33,7 +33,8 @@ final class ViewAction implements RequestHandlerInterface
 
         $book = $this->bookRepository->getById($id);
 
-        $data[$id] = $book->getAsArray();
+        $bookId = $book->getId()->getValue();
+        $data[$bookId] = $book->getAsArray();
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

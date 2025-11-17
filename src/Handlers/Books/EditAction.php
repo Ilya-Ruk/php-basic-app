@@ -7,7 +7,7 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Models\Books\BookFactory;
+use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
@@ -31,7 +31,7 @@ final class EditAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = (int)$request->getAttribute('id', 0);
-        $book = BookFactory::createFromArray($request->getParsedBody());
+        $book = BookFactory::createFromRequestData($request->getParsedBody());
 
         $this->bookRepository->edit($id, $book);
 

@@ -33,8 +33,9 @@ final class ListAction implements RequestHandlerInterface
 
         $data = [];
 
-        foreach ($bookList as $id => $book) {
-            $data[$id] = $book->getAsArray();
+        foreach ($bookList as $book) {
+            $bookId = $book->getId()->getValue();
+            $data[$bookId] = $book->getAsArray();
         }
 
         $body = $this->jsonHelper->encode($data);
