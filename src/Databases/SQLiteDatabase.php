@@ -35,35 +35,33 @@ final class SQLiteDatabase implements DatabaseInterface
     /**
      * @inheritDoc
      */
-    public function getByPrimaryKey(string $tableName, int $id): array
+    public function getByConditions(string $tableName, array $conditions = [], ?int $limit = null, ?int $offset = null): array
     {
-        $primaryKey = $this->getPrimaryKey($tableName);
+        $whereList = [];
+        $paramList = [];
 
-        $query = 'SELECT *';
-        $query .= ' FROM `' . $tableName . '`';
-        $query .= ' WHERE `' . $primaryKey . '` = :' . $primaryKey;
-        $query .= ' LIMIT 1';
-
-        $statement = $this->prepareQuery($query);
-        $this->executePreparedQuery($statement, [$primaryKey => $id]);
-        $rows = $this->fetchAll($statement);
-
-        if (count($rows) === 0) {
-            throw new RecordNotFoundException(sprintf("Record with id %d not found!", $id), 404);
+        foreach ($conditions as $field => $value) {
+            $whereList[] = '`' . $field . '` = :' . $field;
+            $paramList[$field] = $value;
         }
 
-        return $rows[0];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAll(string $tableName): array
-    {
         $query = 'SELECT *';
         $query .= ' FROM `' . $tableName . '`';
 
-        $statement = $this->executeQuery($query);
+        if (count($whereList) > 0) {
+            $query .= ' WHERE ' . implode(', ', $whereList);
+        }
+
+        if (!is_null($limit)) {
+            $query .= ' LIMIT ' . $limit;
+        }
+
+        if (!is_null($offset)) {
+            $query .= ' OFFSET ' . $offset;
+        }
+
+        $statement = $this->prepareQuery($query);
+        $this->executePreparedQuery($statement, $paramList);
 
         return $this->fetchAll($statement);
     }
@@ -77,79 +75,95 @@ final class SQLiteDatabase implements DatabaseInterface
             throw new RuntimeException("Empty data for insert!", 500);
         }
 
-        $fieldList = array_keys($data);
+        $fieldList = [];
+        $valueList = [];
+        $paramList = [];
 
-        $valueList = array_map(
-            function (int|string $field) {
-                return ':' . $field;
-            },
-            $fieldList
-        );
+        foreach ($data as $field => $value) {
+            $fieldList[] = '`' . $field . '`';
+            $valueList[] = ':' . $field;
+            $paramList[$field] = $value;
+        }
 
         $query = 'INSERT INTO `' . $tableName . '`';
-        $query .= ' (`' . implode('`, `', $fieldList) . '`)';
+        $query .= ' (' . implode(', ', $fieldList) . ')';
         $query .= ' VALUES (' . implode(', ', $valueList) . ')';
 
         $statement = $this->prepareQuery($query);
-        $this->executePreparedQuery($statement, $data);
+        $this->executePreparedQuery($statement, $paramList);
 
-        return (int)$this->connection->lastInsertId();
+        return $statement->rowCount();
     }
 
     /**
      * @inheritDoc
      */
-    public function update(string $tableName, int $id, array $data): void
+    public function update(string $tableName, array $data, array $conditions): int
     {
         if (count($data) === 0) {
             throw new RuntimeException("Empty data for update!", 500);
         }
 
-        $primaryKey = $this->getPrimaryKey($tableName);
+        $setList = [];
+        $whereList = [];
+        $paramList = [];
 
-        $fieldList = array_keys($data);
+        foreach ($data as $field => $value) {
+            if (array_key_exists($field, $conditions)) {
+                continue;
+            }
 
-        $setList = array_map(
-            function (int|string $field) {
-                return '`' . $field . '` = :' . $field;
-            },
-            $fieldList
-        );
+            $setList[] = '`' . $field . '` = :' . $field;
+            $paramList[$field] = $value;
+        }
+
+        foreach ($conditions as $field => $value) {
+            $whereList[] = '`' . $field . '` = :' . $field;
+            $paramList[$field] = $value;
+        }
 
         $query = 'UPDATE `' . $tableName . '`';
         $query .= ' SET ' . implode(', ', $setList);
-        $query .= ' WHERE `' . $primaryKey . '` = :' . $primaryKey;
+
+        if (count($whereList) > 0) {
+            $query .= ' WHERE ' . implode(', ', $whereList);
+        }
 
         $statement = $this->prepareQuery($query);
-        $this->executePreparedQuery($statement, array_merge($data, [$primaryKey => $id]));
+        $this->executePreparedQuery($statement, $paramList);
 
-        if ($statement->rowCount() !== 1) {
-            throw new RuntimeException(sprintf("Update record with id %d error!", $id), 500);
-        }
+        return $statement->rowCount();
     }
 
     /**
      * @inheritDoc
      */
-    public function delete(string $tableName, int $id): void
+    public function delete(string $tableName, array $conditions): int
     {
-        $primaryKeyName = $this->getPrimaryKey($tableName);
+        $whereList = [];
+        $paramList = [];
+
+        foreach ($conditions as $field => $value) {
+            $whereList[] = '`' . $field . '` = :' . $field;
+            $paramList[$field] = $value;
+        }
 
         $query = 'DELETE FROM `' . $tableName . '`';
-        $query .= ' WHERE `' . $primaryKeyName . '` = :' . $primaryKeyName;
+
+        if (count($whereList) > 0) {
+            $query .= ' WHERE ' . implode(', ', $whereList);
+        }
 
         $statement = $this->prepareQuery($query);
-        $this->executePreparedQuery($statement, [$primaryKeyName => $id]);
+        $this->executePreparedQuery($statement, $paramList);
 
-        if ($statement->rowCount() !== 1) {
-            throw new RuntimeException(sprintf("Delete record with id %d error!", $id), 500);
-        }
+        return $statement->rowCount();
     }
 
     /**
      * @inheritDoc
      */
-    public function getPrimaryKey(string $tableName): ?string
+    public function getPrimaryKey(string $tableName): array
     {
         $query = 'PRAGMA table_info (`' . $tableName . '`)';
 
@@ -157,13 +171,59 @@ final class SQLiteDatabase implements DatabaseInterface
 
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+        $fieldList = [];
+
         foreach ($rows as $row) {
             if ($row['pk'] === 1) {
-                return $row['name'];
+                $fieldList[] = $row['name'];
             }
         }
 
-        return null;
+        return $fieldList;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNextId(string $tableName): int
+    {
+        $this->connection->beginTransaction();
+
+        $rows = $this->getByConditions(
+            'sqlite_sequence',
+            ['name' => $tableName],
+            1
+        );
+
+        if (count($rows) === 0) {
+            $nextId = 1;
+
+            $rowCount = $this->insert(
+                'sqlite_sequence',
+                [
+                    'name' => $tableName,
+                    'seq' => $nextId,
+                ]
+            );
+        } else {
+            $nextId = $rows[0]['seq'] + 1;
+
+            $rowCount = $this->update(
+                'sqlite_sequence',
+                ['seq' => $nextId],
+                ['name' => $tableName]
+            );
+        }
+
+        if ($rowCount !== 1) {
+            $this->connection->rollBack();
+
+            throw new RuntimeException("Table 'sqlite_sequence' insert/update error!", 500);
+        }
+
+        $this->connection->commit();
+
+        return $nextId;
     }
 
     /**
@@ -175,6 +235,10 @@ final class SQLiteDatabase implements DatabaseInterface
         try {
             $statement = $this->connection->prepare($query);
         } catch (PDOException $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
             throw new RuntimeException(sprintf("Database query '%s' prepare error!", $query), 500, $e);
         }
 
@@ -191,6 +255,10 @@ final class SQLiteDatabase implements DatabaseInterface
         try {
             $statement->execute($params);
         } catch (PDOException $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
             throw new RuntimeException(sprintf("Database query '%s' execute error!", $statement->queryString), 500, $e);
         }
     }
@@ -204,6 +272,10 @@ final class SQLiteDatabase implements DatabaseInterface
         try {
             $statement = $this->connection->query($query);
         } catch (PDOException $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
             throw new RuntimeException(sprintf("Database query '%s' execute error!", $query), 500, $e);
         }
 
@@ -219,6 +291,10 @@ final class SQLiteDatabase implements DatabaseInterface
         try {
             $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
             throw new RuntimeException(sprintf("Database query '%s' fetch error!", $statement->queryString), 500, $e);
         }
 

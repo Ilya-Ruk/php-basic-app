@@ -8,16 +8,12 @@ interface DatabaseInterface
 {
     /**
      * @param string $tableName
-     * @param int $id
+     * @param array $conditions
+     * @param int|null $limit
+     * @param int|null $offset
      * @return array
      */
-    public function getByPrimaryKey(string $tableName, int $id): array;
-
-    /**
-     * @param string $tableName
-     * @return array
-     */
-    public function getAll(string $tableName): array;
+    public function getByConditions(string $tableName, array $conditions = [], ?int $limit = null, ?int $offset = null): array;
 
     /**
      * @param string $tableName
@@ -28,22 +24,28 @@ interface DatabaseInterface
 
     /**
      * @param string $tableName
-     * @param int $id
      * @param array $data
-     * @return void
+     * @param array $conditions
+     * @return int
      */
-    public function update(string $tableName, int $id, array $data): void;
+    public function update(string $tableName, array $data, array $conditions): int;
 
     /**
      * @param string $tableName
-     * @param int $id
-     * @return void
+     * @param array $conditions
+     * @return int
      */
-    public function delete(string $tableName, int $id): void;
+    public function delete(string $tableName, array $conditions): int;
 
     /**
      * @param string $tableName
-     * @return string|null
+     * @return array
      */
-    public function getPrimaryKey(string $tableName): ?string;
+    public function getPrimaryKey(string $tableName): array;
+
+    /**
+     * @param string $tableName
+     * @return int
+     */
+    public function getNextId(string $tableName): int;
 }
