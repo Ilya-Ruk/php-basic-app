@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Rukavishnikov\Php\Basic\App\Repositories\Books;
 
 use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
-use Rukavishnikov\Php\Basic\App\Databases\RecordNotFoundException;
-use Rukavishnikov\Php\Basic\App\Models\Books\Book;
-use Rukavishnikov\Php\Basic\App\Models\Books\BookFactory;
+use Rukavishnikov\Php\Basic\App\Entities\Books\Book;
+use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 
 final class SQLiteBookRepository implements BookRepositoryInterface
 {
@@ -15,6 +14,11 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      * @var string
      */
     private string $tableName = 'books';
+
+    /**
+     * @var string
+     */
+    private string $primaryKey = 'id';
 
     /**
      * @param DatabaseInterface $database
@@ -29,13 +33,17 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function getById(int $id): Book
     {
-        try {
-            $row = $this->database->getByPrimaryKey($this->tableName, $id);
-        } catch (RecordNotFoundException $e) {
-            throw new BookNotFoundException(sprintf("Book with id %d not found!", $id), 404, $e);
+        $rows = $this->database->getByConditions(
+            $this->tableName,
+            [$this->primaryKey => $id],
+            1
+        );
+
+        if (count($rows) === 0) {
+            throw new BookNotFoundException(sprintf("Book with id %d not found!", $id), 404);
         }
 
-        return BookFactory::createFromArray($row);
+        return BookFactory::createFromDatabaseRow($rows[0]);
     }
 
     /**
@@ -43,16 +51,12 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function getAll(): array
     {
-        $rows = $this->database->getAll($this->tableName);
-
-        $primaryKey = $this->database->getPrimaryKey($this->tableName);
+        $rows = $this->database->getByConditions($this->tableName);
 
         $bookList = [];
 
         foreach ($rows as $row) {
-            $id = $row[$primaryKey];
-
-            $bookList[$id] = BookFactory::createFromArray($row);
+            $bookList[] = BookFactory::createFromDatabaseRow($row);
         }
 
         return $bookList;
@@ -61,11 +65,11 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function add(Book $book): int
+    public function add(Book $book): void
     {
         $data = $book->getAsArray();
 
-        return $this->database->insert($this->tableName, $data);
+        $this->database->insert($this->tableName, $data);
     }
 
     /**
@@ -75,7 +79,11 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     {
         $data = $book->getAsArray();
 
-        $this->database->update($this->tableName, $id, $data);
+        $this->database->update(
+            $this->tableName,
+            $data,
+            [$this->primaryKey => $id]
+        );
     }
 
     /**
@@ -83,6 +91,17 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function delete(int $id): void
     {
-        $this->database->delete($this->tableName, $id);
+        $this->database->delete(
+            $this->tableName,
+            [$this->primaryKey => $id]
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNextId(): int
+    {
+        return $this->database->getNextId($this->tableName);
     }
 }

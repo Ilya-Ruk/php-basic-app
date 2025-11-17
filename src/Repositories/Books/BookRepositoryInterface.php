@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Rukavishnikov\Php\Basic\App\Repositories\Books;
 
-use Rukavishnikov\Php\Basic\App\Models\Books\Book;
+use Rukavishnikov\Php\Basic\App\Entities\Books\Book;
 
 interface BookRepositoryInterface
 {
@@ -21,9 +21,9 @@ interface BookRepositoryInterface
 
     /**
      * @param Book $book
-     * @return int
+     * @return void
      */
-    public function add(Book $book): int;
+    public function add(Book $book): void;
 
     /**
      * @param int $id
@@ -37,4 +37,9 @@ interface BookRepositoryInterface
      * @return void
      */
     public function delete(int $id): void;
+
+    /**
+     * @return int
+     */
+    public function getNextId(): int;
 }
