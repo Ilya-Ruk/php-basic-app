@@ -18,7 +18,7 @@ $config = require __DIR__ . '/../config/config.php';
 
 $container = new Container($config);
 
-/** @var ApplicationInterface $app */
-$app = $container->get(ApplicationInterface::class);
+/** @var ApplicationInterface $application */
+$application = $container->get(ApplicationInterface::class);
 
-$app->run();
+$application->run();
