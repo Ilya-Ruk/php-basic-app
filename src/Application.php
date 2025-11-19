@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
 use Rukavishnikov\Php\Basic\App\Exceptions\NotFoundException;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
 use Rukavishnikov\Php\Router\RouteNotFoundException;
@@ -52,8 +53,7 @@ final class Application implements ApplicationInterface
     /**
      * @inheritDoc
      *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws InternalServerErrorException
      * @throws NotFoundException
      */
     public function run(): void
@@ -74,8 +74,12 @@ final class Application implements ApplicationInterface
 
         // Get handler
 
-        /** @var RequestHandlerInterface $targetHandler */
-        $targetHandler = $this->container->get($route->handler);
+        try {
+            /** @var RequestHandlerInterface $targetHandler */
+            $targetHandler = $this->container->get($route->handler);
+        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
+            throw new InternalServerErrorException('Internal server error!', 500, $e);
+        }
 
         // Handle a server request and produces a response use middlewares
 
