@@ -59,7 +59,7 @@ final class ApplicationErrorHandler
 
         $code = $e->getCode();
 
-        if ($code >= 400 && $code <= 599) { // Client error or server error
+        if ($code >= 400 && $code <= 599) { // 4xx (Client Error) / 5xx (Server Error)
             $responseCode = $code;
         } else {
             $responseCode = 500; // Internal Server Error
@@ -95,7 +95,7 @@ final class ApplicationErrorHandler
             if ($trace !== false) {
                 $data['trace'] = $e->getTrace();
             }
-        } elseif ($code >= 100 && $code <= 499) {
+        } elseif ($code >= 100 && $code <= 599) { // Valid HTTP response status code
             $data = [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage(),
