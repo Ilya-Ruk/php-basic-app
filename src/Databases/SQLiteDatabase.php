@@ -72,7 +72,7 @@ final class SQLiteDatabase implements DatabaseInterface
     public function insert(string $tableName, array $data): int
     {
         if (count($data) === 0) {
-            throw new RuntimeException("Empty data for insert!");
+            throw new RuntimeException('Empty data for insert!');
         }
 
         $fieldList = [];
@@ -101,7 +101,7 @@ final class SQLiteDatabase implements DatabaseInterface
     public function update(string $tableName, array $data, array $conditions): int
     {
         if (count($data) === 0) {
-            throw new RuntimeException("Empty data for update!");
+            throw new RuntimeException('Empty data for update!');
         }
 
         $setList = [];
