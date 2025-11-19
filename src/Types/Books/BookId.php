@@ -16,7 +16,7 @@ final class BookId
     private function __construct(private int $id)
     {
         if ($this->id < self::MIN_ID) {
-            throw new InvalidArgumentException(sprintf("Id must be greater or equal of %d!", self::MIN_ID), 400);
+            throw new InvalidArgumentException(sprintf("Id must be greater or equal of %d!", self::MIN_ID));
         }
     }
 

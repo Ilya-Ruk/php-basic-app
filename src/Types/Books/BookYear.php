@@ -16,13 +16,13 @@ final class BookYear
     private function __construct(private int $year)
     {
         if ($this->year < self::MIN_YEAR) {
-            throw new InvalidArgumentException(sprintf("Year must be greater or equal of %d!", self::MIN_YEAR), 400);
+            throw new InvalidArgumentException(sprintf("Year must be greater or equal of %d!", self::MIN_YEAR));
         }
 
         $maxYear = (int)date('Y') + 1;
 
         if ($this->year > $maxYear) {
-            throw new InvalidArgumentException(sprintf("Year must be less or equal of %d!", $maxYear), 400);
+            throw new InvalidArgumentException(sprintf("Year must be less or equal of %d!", $maxYear));
         }
     }
 

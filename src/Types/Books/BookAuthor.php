@@ -17,11 +17,11 @@ final class BookAuthor
     private function __construct(private string $author)
     {
         if (strlen($this->author) < self::MIN_LENGTH) {
-            throw new InvalidArgumentException(sprintf("Author name length must be greater or equal of %d char!", self::MIN_LENGTH), 400);
+            throw new InvalidArgumentException(sprintf("Author name length must be greater or equal of %d char!", self::MIN_LENGTH));
         }
 
         if (strlen($this->author) > self::MAX_LENGTH) {
-            throw new InvalidArgumentException(sprintf("Author name must be less or equal of %d chars!", self::MAX_LENGTH), 400);
+            throw new InvalidArgumentException(sprintf("Author name must be less or equal of %d chars!", self::MAX_LENGTH));
         }
     }
 
