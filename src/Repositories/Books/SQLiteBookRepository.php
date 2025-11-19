@@ -44,7 +44,7 @@ final class SQLiteBookRepository implements BookRepositoryInterface
         );
 
         if (count($rows) === 0) {
-            throw new BookNotFoundException(sprintf("Book with id %d not found!", $id), 404);
+            throw new BookNotFoundException(sprintf("Book with id %d not found!", $id));
         }
 
         return BookFactory::createFromDatabaseRow($rows[0]);
