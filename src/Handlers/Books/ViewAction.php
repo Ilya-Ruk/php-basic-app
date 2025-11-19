@@ -7,7 +7,9 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Exceptions\NotFoundException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookNotFoundException;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
 final class ViewAction implements RequestHandlerInterface
@@ -26,12 +28,17 @@ final class ViewAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
+     * @throws NotFoundException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = (int)$request->getAttribute('id', 0);
 
-        $book = $this->bookRepository->getById($id);
+        try {
+            $book = $this->bookRepository->getById($id);
+        } catch (BookNotFoundException $e) {
+            throw new NotFoundException($e->getMessage(), 404, $e);
+        }
 
         $bookId = $book->getId()->getValue();
         $data[$bookId] = $book->getAsArray();
