@@ -37,7 +37,7 @@ final class DeleteAction implements RequestHandlerInterface
         try {
             $this->bookRepository->delete($id);
         } catch (BookDeleteException $e) {
-            throw new InternalServerErrorException($e->getMessage(), 500, $e);
+            throw new InternalServerErrorException(sprintf("Book with id %d delete error!", $id), 500, $e);
         }
 
         $data[$id] = "Book deleted!";

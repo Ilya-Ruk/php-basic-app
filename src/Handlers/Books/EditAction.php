@@ -12,7 +12,7 @@ use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestException;
 use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookUpdateException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookEditException;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
 final class EditAction implements RequestHandlerInterface
@@ -46,11 +46,11 @@ final class EditAction implements RequestHandlerInterface
 
         try {
             $this->bookRepository->edit($id, $book);
-        } catch (BookUpdateException $e) {
-            throw new InternalServerErrorException($e->getMessage(), 500, $e);
+        } catch (BookEditException $e) {
+            throw new InternalServerErrorException(sprintf("Book with id %d edit error!", $id), 500, $e);
         }
 
-        $data[$id] = "Book updated!";
+        $data[$id] = "Book edited!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

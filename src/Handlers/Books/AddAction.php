@@ -12,7 +12,8 @@ use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestException;
 use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookInsertException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookAddException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetNextIdException;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 
 final class AddAction implements RequestHandlerInterface
@@ -42,15 +43,16 @@ final class AddAction implements RequestHandlerInterface
             throw new BadRequestException($e->getMessage(), 400, $e);
         }
 
-        $nextBookId = $this->bookRepository->getNextId();
-
         try {
-            $this->bookRepository->add($book->withId($nextBookId));
-        } catch (BookInsertException $e) {
-            throw new InternalServerErrorException($e->getMessage(), 500, $e);
+            $nextId = $this->bookRepository->getNextId();
+            $bookWithId = $book->withId($nextId);
+
+            $this->bookRepository->add($bookWithId);
+        } catch (BookGetNextIdException|BookAddException $e) {
+            throw new InternalServerErrorException('Book add error!', 500, $e);
         }
 
-        $data[$nextBookId] = "Book inserted!";
+        $data[$nextId] = "Book added!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
