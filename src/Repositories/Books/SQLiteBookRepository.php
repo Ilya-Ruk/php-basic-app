@@ -8,9 +8,13 @@ use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
 use Rukavishnikov\Php\Basic\App\Entities\Books\Book;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookDeleteException;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookInsertException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookAddException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetAllException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetNextIdException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookNotFoundException;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookUpdateException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookEditException;
+use RuntimeException;
 
 final class SQLiteBookRepository implements BookRepositoryInterface
 {
@@ -37,11 +41,15 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function getById(int $id): Book
     {
-        $rows = $this->database->getByConditions(
-            $this->tableName,
-            [$this->primaryKey => $id],
-            1
-        );
+        try {
+            $rows = $this->database->getByConditions(
+                $this->tableName,
+                [$this->primaryKey => $id],
+                1
+            );
+        } catch (RuntimeException $e) {
+            throw new BookGetException(sprintf("Book with id %d get error!", $id), 0, $e);
+        }
 
         if (count($rows) === 0) {
             throw new BookNotFoundException(sprintf("Book with id %d not found!", $id));
@@ -55,7 +63,11 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function getAll(): array
     {
-        $rows = $this->database->getByConditions($this->tableName);
+        try {
+            $rows = $this->database->getByConditions($this->tableName);
+        } catch (RuntimeException $e) {
+            throw new BookGetAllException('Get all books error!', 0, $e);
+        }
 
         $bookList = [];
 
@@ -73,10 +85,14 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     {
         $data = $book->getAsArray();
 
-        $rowCount = $this->database->insert($this->tableName, $data);
+        try {
+            $rowCount = $this->database->insert($this->tableName, $data);
+        } catch (RuntimeException $e) {
+            throw new BookAddException('Book add error!', 0, $e);
+        }
 
         if ($rowCount !== 1) {
-            throw new BookInsertException('Book insert error!');
+            throw new BookAddException('Book add error!');
         }
     }
 
@@ -87,14 +103,18 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     {
         $data = $book->getAsArray();
 
-        $rowCount = $this->database->update(
-            $this->tableName,
-            $data,
-            [$this->primaryKey => $id]
-        );
+        try {
+            $rowCount = $this->database->update(
+                $this->tableName,
+                $data,
+                [$this->primaryKey => $id]
+            );
+        } catch (RuntimeException $e) {
+            throw new BookEditException(sprintf("Book with id %d edit error!", $id), 0, $e);
+        }
 
         if ($rowCount !== 1) {
-            throw new BookUpdateException(sprintf("Book with id %d update error!", $id));
+            throw new BookEditException(sprintf("Book with id %d edit error!", $id));
         }
     }
 
@@ -103,10 +123,14 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function delete(int $id): void
     {
-        $rowCount = $this->database->delete(
-            $this->tableName,
-            [$this->primaryKey => $id]
-        );
+        try {
+            $rowCount = $this->database->delete(
+                $this->tableName,
+                [$this->primaryKey => $id]
+            );
+        } catch (RuntimeException $e) {
+            throw new BookDeleteException(sprintf("Book with id %d delete error!", $id), 0, $e);
+        }
 
         if ($rowCount !== 1) {
             throw new BookDeleteException(sprintf("Book with id %d delete error!", $id));
@@ -118,6 +142,10 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function getNextId(): int
     {
-        return $this->database->getNextId($this->tableName);
+        try {
+            return $this->database->getNextId($this->tableName);
+        } catch (RuntimeException $e) {
+            throw new BookGetNextIdException('Get book next id error!', 0, $e);
+        }
     }
 }

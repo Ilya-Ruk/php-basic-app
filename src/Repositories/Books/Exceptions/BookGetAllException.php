@@ -6,6 +6,6 @@ namespace Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions;
 
 use RuntimeException;
 
-final class BookUpdateException extends RuntimeException
+final class BookGetAllException extends RuntimeException
 {
 }
