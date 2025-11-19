@@ -85,8 +85,8 @@ final class Application implements ApplicationInterface
 
         if (
             $request->getMethod() === ServerRequest::METHOD_HEAD
-            || ($response->getStatusCode() >= 100 && $response->getStatusCode() < 200)
-            || in_array($response->getStatusCode(), [204, 304])
+            || ($response->getStatusCode() >= 100 && $response->getStatusCode() <= 199) // 1xx (Informational)
+            || in_array($response->getStatusCode(), [204, 304]) // No Content / Not Modified
         ) {
             $withoutBody = true;
         } else {
