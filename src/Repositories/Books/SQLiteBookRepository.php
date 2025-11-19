@@ -7,6 +7,10 @@ namespace Rukavishnikov\Php\Basic\App\Repositories\Books;
 use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
 use Rukavishnikov\Php\Basic\App\Entities\Books\Book;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookDeleteException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookInsertException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookNotFoundException;
+use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookUpdateException;
 
 final class SQLiteBookRepository implements BookRepositoryInterface
 {
@@ -69,7 +73,11 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     {
         $data = $book->getAsArray();
 
-        $this->database->insert($this->tableName, $data);
+        $rowCount = $this->database->insert($this->tableName, $data);
+
+        if ($rowCount !== 1) {
+            throw new BookInsertException('Book insert error!');
+        }
     }
 
     /**
@@ -79,11 +87,15 @@ final class SQLiteBookRepository implements BookRepositoryInterface
     {
         $data = $book->getAsArray();
 
-        $this->database->update(
+        $rowCount = $this->database->update(
             $this->tableName,
             $data,
             [$this->primaryKey => $id]
         );
+
+        if ($rowCount !== 1) {
+            throw new BookUpdateException(sprintf("Book with id %d update error!", $id));
+        }
     }
 
     /**
@@ -91,10 +103,14 @@ final class SQLiteBookRepository implements BookRepositoryInterface
      */
     public function delete(int $id): void
     {
-        $this->database->delete(
+        $rowCount = $this->database->delete(
             $this->tableName,
             [$this->primaryKey => $id]
         );
+
+        if ($rowCount !== 1) {
+            throw new BookDeleteException(sprintf("Book with id %d delete error!", $id));
+        }
     }
 
     /**
