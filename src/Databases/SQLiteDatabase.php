@@ -28,7 +28,7 @@ final class SQLiteDatabase implements DatabaseInterface
         try {
             $this->connection = new PDO('sqlite:' . $dbFileName);
         } catch (PDOException $e) {
-            throw new RuntimeException(sprintf("Database '%s' connect error!", $dbFileName), 500, $e);
+            throw new RuntimeException(sprintf("Database '%s' connect error!", $dbFileName), 0, $e);
         }
     }
 
@@ -72,7 +72,7 @@ final class SQLiteDatabase implements DatabaseInterface
     public function insert(string $tableName, array $data): int
     {
         if (count($data) === 0) {
-            throw new RuntimeException("Empty data for insert!", 500);
+            throw new RuntimeException("Empty data for insert!");
         }
 
         $fieldList = [];
@@ -101,7 +101,7 @@ final class SQLiteDatabase implements DatabaseInterface
     public function update(string $tableName, array $data, array $conditions): int
     {
         if (count($data) === 0) {
-            throw new RuntimeException("Empty data for update!", 500);
+            throw new RuntimeException("Empty data for update!");
         }
 
         $setList = [];
@@ -218,7 +218,7 @@ final class SQLiteDatabase implements DatabaseInterface
         if ($rowCount !== 1) {
             $this->connection->rollBack();
 
-            throw new RuntimeException("Table 'sqlite_sequence' insert/update error!", 500);
+            throw new RuntimeException("Table 'sqlite_sequence' insert/update error!");
         }
 
         $this->connection->commit();
@@ -239,7 +239,7 @@ final class SQLiteDatabase implements DatabaseInterface
                 $this->connection->rollBack();
             }
 
-            throw new RuntimeException(sprintf("Database query '%s' prepare error!", $query), 500, $e);
+            throw new RuntimeException(sprintf("Database query '%s' prepare error!", $query), 0, $e);
         }
 
         return $statement;
@@ -259,7 +259,7 @@ final class SQLiteDatabase implements DatabaseInterface
                 $this->connection->rollBack();
             }
 
-            throw new RuntimeException(sprintf("Database query '%s' execute error!", $statement->queryString), 500, $e);
+            throw new RuntimeException(sprintf("Database query '%s' execute error!", $statement->queryString), 0, $e);
         }
     }
 
@@ -276,7 +276,7 @@ final class SQLiteDatabase implements DatabaseInterface
                 $this->connection->rollBack();
             }
 
-            throw new RuntimeException(sprintf("Database query '%s' execute error!", $query), 500, $e);
+            throw new RuntimeException(sprintf("Database query '%s' execute error!", $query), 0, $e);
         }
 
         return $statement;
@@ -295,7 +295,7 @@ final class SQLiteDatabase implements DatabaseInterface
                 $this->connection->rollBack();
             }
 
-            throw new RuntimeException(sprintf("Database query '%s' fetch error!", $statement->queryString), 500, $e);
+            throw new RuntimeException(sprintf("Database query '%s' fetch error!", $statement->queryString), 0, $e);
         }
 
         return $rows;

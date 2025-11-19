@@ -146,7 +146,7 @@ final class ApplicationErrorHandler
     public static function errorHandler(int $errorLevel, string $errorMessage, string $fileName, int $lineNumber): bool
     {
         if (error_reporting() & $errorLevel) {
-            throw new ErrorException($errorMessage, 500, $errorLevel, $fileName, $lineNumber);
+            throw new ErrorException($errorMessage, 0, $errorLevel, $fileName, $lineNumber);
         }
 
         return false;
