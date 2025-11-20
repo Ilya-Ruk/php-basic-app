@@ -20,11 +20,14 @@ use Rukavishnikov\Php\Basic\App\Middlewares\AccessLoggerMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ApplicationJsonMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentLengthMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentTypeMiddleware;
+use Rukavishnikov\Php\Basic\App\Middlewares\ErrorHandlerMiddleware;
+use Rukavishnikov\Php\Basic\App\Middlewares\RouteDispatcherMiddleware;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\SQLiteBookRepository;
 use Rukavishnikov\Php\Emitter\Emitter;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
 use Rukavishnikov\Php\Helper\Classes\FilePath;
+use Rukavishnikov\Php\Helper\Classes\JsonHelper;
 use Rukavishnikov\Php\Helper\Classes\ValueToStringHelper;
 use Rukavishnikov\Php\Router\Route;
 use Rukavishnikov\Php\Router\Router;
@@ -43,22 +46,29 @@ return [
     ApplicationInterface::class => [
         'class' => Application::class,
 
-        '__construct()' => [
-            static fn (ContainerInterface $container) => $container,
-        ],
-
         'setMiddlewareList()' => [
             static fn (ContainerInterface $container) => [
-                $container->get(ContentLengthMiddleware::class), // Add Content-Length header to response
-                $container->get(ContentTypeMiddleware::class), // Add Content-Type header to response
+                $container->get(ErrorHandlerMiddleware::class), // Catches all exceptions (must be first)
 
-                $container->get(AccessLoggerMiddleware::class), // Write access log
+                $container->get(ContentLengthMiddleware::class), // Adds Content-Length header to response
+                $container->get(ContentTypeMiddleware::class), // Adds Content-Type header to response
 
-                $container->get(ApplicationJsonMiddleware::class), // Decode request body (JSON)
+                $container->get(AccessLoggerMiddleware::class), // Writers access log
+
+                $container->get(ApplicationJsonMiddleware::class), // Decodes request body (JSON)
+
+                $container->get(RouteDispatcherMiddleware::class), // Routes select, gets handler and call it (must be last)
             ],
         ],
     ],
     ServerRequestInterface::class => ServerRequest::class,
+    RouteDispatcherMiddleware::class => [
+        'class' => RouteDispatcherMiddleware::class,
+
+        '__construct()' => [
+            static fn (ContainerInterface $container) => $container,
+        ],
+    ],
     RouterInterface::class => [
         'class' => Router::class,
 
@@ -98,6 +108,16 @@ return [
         '__construct()' => [
             ValueToStringHelper::class,
             $startDateTime,
+        ],
+    ],
+    ErrorHandlerMiddleware::class => [
+        'class' => ErrorHandlerMiddleware::class,
+
+        '__construct()' => [
+            JsonHelper::class,
+            new Response(), // Create new instance for error handler response
+            (bool)getenv('X_DEBUG', true),
+            (bool)getenv('X_TRACE', true),
         ],
     ],
 ];
