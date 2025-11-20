@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace Rukavishnikov\Php\Basic\App;
 
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
-use Rukavishnikov\Php\Basic\App\Exceptions\NotFoundException;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
-use Rukavishnikov\Php\Router\RouteNotFoundException;
-use Rukavishnikov\Php\Router\RouterInterface;
 use Rukavishnikov\Psr\Http\Message\ServerRequest;
 
 final class Application implements ApplicationInterface
@@ -26,16 +19,14 @@ final class Application implements ApplicationInterface
     private array $middlewareList = [];
 
     /**
-     * @param ContainerInterface $container
      * @param ServerRequestInterface $request
-     * @param RouterInterface $router
      * @param EmitterInterface $emitter
+     * @param ApplicationNotFoundHandler $applicationNotFoundHandler
      */
     public function __construct(
-        private ContainerInterface $container,
         private ServerRequestInterface $request,
-        private RouterInterface $router,
         private EmitterInterface $emitter,
+        private ApplicationNotFoundHandler $applicationNotFoundHandler,
     ) {
     }
 
@@ -52,43 +43,17 @@ final class Application implements ApplicationInterface
 
     /**
      * @inheritDoc
-     *
-     * @throws InternalServerErrorException
-     * @throws NotFoundException
      */
     public function run(): void
     {
-        $request = $this->request;
-
-        // Get route from request, parse request attributes and add them to request
-
-        try {
-            $route = $this->router->getRoute($request);
-        } catch (RouteNotFoundException $e) {
-            throw new NotFoundException('Not found!', 404, $e);
-        }
-
-        foreach ($route->attributes as $name => $value) {
-            $request = $request->withAttribute($name, $value);
-        }
-
-        // Get handler
-
-        try {
-            /** @var RequestHandlerInterface $targetHandler */
-            $targetHandler = $this->container->get($route->handler);
-        } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
-            throw new InternalServerErrorException('Internal server error!', 500, $e);
-        }
-
         // Handle a server request and produces a response use middlewares
 
-        $response = $this->handler($targetHandler)->handle($request);
+        $response = $this->handler($this->applicationNotFoundHandler)->handle($this->request);
 
         // Emit response
 
         if (
-            $request->getMethod() === ServerRequest::METHOD_HEAD
+            $this->request->getMethod() === ServerRequest::METHOD_HEAD
             || ($response->getStatusCode() >= 100 && $response->getStatusCode() <= 199) // 1xx (Informational)
             || in_array($response->getStatusCode(), [204, 304]) // No Content / Not Modified
         ) {
