@@ -51,8 +51,8 @@ final class ApplicationErrorHandler
      */
     public static function exceptionHandler(Throwable $e): void
     {
-        $debug = getenv('X_DEBUG', true);
-        $trace = getenv('X_TRACE', true);
+        $debug = (bool)getenv('X_DEBUG', true);
+        $trace = (bool)getenv('X_TRACE', true);
 
         $serverProtocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1';
         $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -67,7 +67,7 @@ final class ApplicationErrorHandler
 
         $responseReasonPhrase = self::$reasonPhraseList[$responseCode] ?? null;
 
-        if ($debug !== false) {
+        if ($debug) {
             $data = [
                 'code' => $e->getCode(),
                 'message' => $e->getMessage(),
@@ -92,7 +92,7 @@ final class ApplicationErrorHandler
                 $errorLevel++;
             }
 
-            if ($trace !== false) {
+            if ($trace) {
                 $data['trace'] = $e->getTrace();
             }
         } elseif ($code >= 100 && $code <= 599) { // Valid HTTP response status code
