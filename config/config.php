@@ -62,6 +62,26 @@ return [
         ],
     ],
     ServerRequestInterface::class => ServerRequest::class,
+    ResponseInterface::class => Response::class,
+    EmitterInterface::class => Emitter::class,
+    BookRepositoryInterface::class => SQLiteBookRepository::class,
+    DatabaseInterface::class => [
+        'class' => SQLiteDatabase::class,
+
+        '__construct()' => [
+            static fn () => new FilePath(__DIR__ . '/../database/test.sqlite3'),
+        ],
+    ],
+    ErrorHandlerMiddleware::class => [
+        'class' => ErrorHandlerMiddleware::class,
+
+        '__construct()' => [
+            JsonHelper::class,
+            new Response(), // Create new instance for error handler response
+            (bool)getenv('X_DEBUG', true),
+            (bool)getenv('X_TRACE', true),
+        ],
+    ],
     RouteDispatcherMiddleware::class => [
         'class' => RouteDispatcherMiddleware::class,
 
@@ -84,16 +104,6 @@ return [
             ],
         ],
     ],
-    ResponseInterface::class => Response::class,
-    EmitterInterface::class => Emitter::class,
-    DatabaseInterface::class => [
-        'class' => SQLiteDatabase::class,
-
-        '__construct()' => [
-            static fn () => new FilePath(__DIR__ . '/../database/test.sqlite3'),
-        ],
-    ],
-    BookRepositoryInterface::class => SQLiteBookRepository::class,
     LoggerInterface::class => Log::class,
     LogTargetInterface::class => [
         'class' => LogTargetFile::class,
@@ -108,16 +118,6 @@ return [
         '__construct()' => [
             ValueToStringHelper::class,
             $startDateTime,
-        ],
-    ],
-    ErrorHandlerMiddleware::class => [
-        'class' => ErrorHandlerMiddleware::class,
-
-        '__construct()' => [
-            JsonHelper::class,
-            new Response(), // Create new instance for error handler response
-            (bool)getenv('X_DEBUG', true),
-            (bool)getenv('X_TRACE', true),
         ],
     ],
 ];
