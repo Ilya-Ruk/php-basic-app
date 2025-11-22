@@ -7,8 +7,8 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
-use Rukavishnikov\Php\Basic\App\Exceptions\NotFoundException;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
+use Rukavishnikov\Php\Basic\App\Exceptions\NotFoundHttpException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookNotFoundException;
@@ -30,8 +30,8 @@ final class ViewAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
-     * @throws InternalServerErrorException
-     * @throws NotFoundException
+     * @throws InternalServerErrorHttpException
+     * @throws NotFoundHttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -40,9 +40,9 @@ final class ViewAction implements RequestHandlerInterface
         try {
             $book = $this->bookRepository->getById($id);
         } catch (BookGetException $e) {
-            throw new InternalServerErrorException(sprintf("Book with id %d get error!", $id), 500, $e);
+            throw new InternalServerErrorHttpException(sprintf("Book with id %d get error!", $id), 500, $e);
         } catch (BookNotFoundException $e) {
-            throw new NotFoundException(sprintf("Book with id %d not found!", $id), 404, $e);
+            throw new NotFoundHttpException(sprintf("Book with id %d not found!", $id), 404, $e);
         }
 
         $bookId = $book->getId()->getValue();

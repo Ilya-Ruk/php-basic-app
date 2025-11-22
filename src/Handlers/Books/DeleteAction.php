@@ -7,7 +7,7 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookDeleteException;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
@@ -28,7 +28,7 @@ final class DeleteAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
-     * @throws InternalServerErrorException
+     * @throws InternalServerErrorHttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -37,7 +37,7 @@ final class DeleteAction implements RequestHandlerInterface
         try {
             $this->bookRepository->delete($id);
         } catch (BookDeleteException $e) {
-            throw new InternalServerErrorException(sprintf("Book with id %d delete error!", $id), 500, $e);
+            throw new InternalServerErrorHttpException(sprintf("Book with id %d delete error!", $id), 500, $e);
         }
 
         $data[$id] = "Book deleted!";

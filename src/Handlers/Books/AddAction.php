@@ -8,8 +8,8 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestException;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
+use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestHttpException;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookAddException;
@@ -32,15 +32,15 @@ final class AddAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
-     * @throws BadRequestException
-     * @throws InternalServerErrorException
+     * @throws BadRequestHttpException
+     * @throws InternalServerErrorHttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
             $book = BookFactory::createFromRequestData($request->getParsedBody());
         } catch (InvalidArgumentException $e) {
-            throw new BadRequestException($e->getMessage(), 400, $e);
+            throw new BadRequestHttpException($e->getMessage(), 400, $e);
         }
 
         try {
@@ -49,7 +49,7 @@ final class AddAction implements RequestHandlerInterface
 
             $this->bookRepository->add($bookWithId);
         } catch (BookGetNextIdException|BookAddException $e) {
-            throw new InternalServerErrorException('Book add error!', 500, $e);
+            throw new InternalServerErrorHttpException('Book add error!', 500, $e);
         }
 
         $data[$nextId] = "Book added!";

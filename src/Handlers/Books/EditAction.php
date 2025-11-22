@@ -8,8 +8,8 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestException;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
+use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestHttpException;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookEditException;
@@ -31,8 +31,8 @@ final class EditAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
-     * @throws BadRequestException
-     * @throws InternalServerErrorException
+     * @throws BadRequestHttpException
+     * @throws InternalServerErrorHttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -41,13 +41,13 @@ final class EditAction implements RequestHandlerInterface
         try {
             $book = BookFactory::createFromRequestData($request->getParsedBody());
         } catch (InvalidArgumentException $e) {
-            throw new BadRequestException($e->getMessage(), 400, $e);
+            throw new BadRequestHttpException($e->getMessage(), 400, $e);
         }
 
         try {
             $this->bookRepository->edit($id, $book);
         } catch (BookEditException $e) {
-            throw new InternalServerErrorException(sprintf("Book with id %d edit error!", $id), 500, $e);
+            throw new InternalServerErrorHttpException(sprintf("Book with id %d edit error!", $id), 500, $e);
         }
 
         $data[$id] = "Book edited!";

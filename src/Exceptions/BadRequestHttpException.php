@@ -6,6 +6,6 @@ namespace Rukavishnikov\Php\Basic\App\Exceptions;
 
 use Exception;
 
-final class InternalServerErrorException extends Exception
+final class BadRequestHttpException extends Exception
 {
 }

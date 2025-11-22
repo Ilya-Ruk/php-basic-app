@@ -7,7 +7,7 @@ namespace Rukavishnikov\Php\Basic\App\Handlers\Books;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorException;
+use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
 use Rukavishnikov\Php\Basic\App\Repositories\Books\Exceptions\BookGetAllException;
 use Rukavishnikov\Php\Helper\Classes\JsonHelper;
@@ -28,14 +28,14 @@ final class ListAction implements RequestHandlerInterface
 
     /**
      * @inheritDoc
-     * @throws InternalServerErrorException
+     * @throws InternalServerErrorHttpException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
             $bookList = $this->bookRepository->getAll();
         } catch (BookGetAllException $e) {
-            throw new InternalServerErrorException('Get all books error!', 500, $e);
+            throw new InternalServerErrorHttpException('Get all books error!', 500, $e);
         }
 
         $data = [];

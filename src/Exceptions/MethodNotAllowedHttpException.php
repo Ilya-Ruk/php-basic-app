@@ -6,6 +6,6 @@ namespace Rukavishnikov\Php\Basic\App\Exceptions;
 
 use Exception;
 
-final class BadRequestException extends Exception
+final class MethodNotAllowedHttpException extends Exception
 {
 }

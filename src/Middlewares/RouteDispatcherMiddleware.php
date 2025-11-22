@@ -11,6 +11,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Exceptions\MethodNotAllowedHttpException;
+use Rukavishnikov\Php\Router\MethodNotAllowedException;
 use Rukavishnikov\Php\Router\RouteNotFoundException;
 use Rukavishnikov\Php\Router\RouterInterface;
 
@@ -31,6 +33,7 @@ final class RouteDispatcherMiddleware implements MiddlewareInterface
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws MethodNotAllowedHttpException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -38,6 +41,8 @@ final class RouteDispatcherMiddleware implements MiddlewareInterface
 
         try {
             $route = $this->router->getRoute($request);
+        } catch (MethodNotAllowedException $e) {
+            throw new MethodNotAllowedHttpException('Method not allowed!', 405, $e);
         } catch (RouteNotFoundException) { // If route not found then calls next handler (ApplicationNotFoundHandler)
             return $handler->handle($request);
         }
