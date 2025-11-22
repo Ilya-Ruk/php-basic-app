@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rukavishnikov\Php\Basic\App\Middlewares;
 
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -22,21 +23,30 @@ final class AccessLoggerMiddleware implements MiddlewareInterface
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = $handler->handle($request);
+        try {
+            $response = $handler->handle($request);
 
-        $message = "{ip} {method} {path} {code}\r\n";
+            $code = $response->getStatusCode();
+        } catch (Exception $e) {
+            $code = $e->getCode();
 
-        $context = [
-            'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? '-',
-            'method' => $request->getMethod(),
-            'path' => $request->getUri()->getPath(),
-            'code' => $response->getStatusCode(),
-        ];
+            throw $e;
+        } finally {
+            $message = "{ip} {method} {path} {code}\r\n";
 
-        $this->logger->info($message, $context);
+            $context = [
+                'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? '-',
+                'method' => $request->getMethod(),
+                'path' => $request->getUri()->getPath(),
+                'code' => $code,
+            ];
+
+            $this->logger->info($message, $context);
+        }
 
         return $response;
     }
