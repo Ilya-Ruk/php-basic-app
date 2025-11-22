@@ -26,11 +26,17 @@ final class ApplicationNotFoundHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = sprintf("Path '%s' not found!", $request->getUri()->getPath());
+        $responseCode = 404; // Not Found
+        $responseMessage = sprintf("Path '%s' not found!", $request->getUri()->getPath());
 
-        $body = $this->jsonHelper->encode($body);
+        $data = [
+            'code' => $responseCode,
+            'message' => $responseMessage,
+        ];
+
+        $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
 
-        return $this->response->withStatus(404); // Not Found
+        return $this->response->withStatus($responseCode);
     }
 }
