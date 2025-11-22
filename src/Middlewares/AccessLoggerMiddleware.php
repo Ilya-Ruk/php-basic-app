@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Rukavishnikov\Php\Basic\App\Middlewares;
 
-use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 final class AccessLoggerMiddleware implements MiddlewareInterface
 {
@@ -23,7 +23,7 @@ final class AccessLoggerMiddleware implements MiddlewareInterface
 
     /**
      * @inheritDoc
-     * @throws Exception
+     * @throws Throwable
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -31,7 +31,7 @@ final class AccessLoggerMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
 
             $code = $response->getStatusCode();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $code = $e->getCode();
 
             throw $e;
