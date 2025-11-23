@@ -9,7 +9,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
-use Rukavishnikov\Psr\Http\Message\ServerRequest;
 
 final class Application implements ApplicationInterface
 {
@@ -53,7 +52,7 @@ final class Application implements ApplicationInterface
         // Emit response
 
         if (
-            $this->request->getMethod() === ServerRequest::METHOD_HEAD
+            $this->request->getMethod() === 'HEAD'
             || ($response->getStatusCode() >= 100 && $response->getStatusCode() <= 199) // 1xx (Informational)
             || in_array($response->getStatusCode(), [204, 304]) // No Content / Not Modified
         ) {
