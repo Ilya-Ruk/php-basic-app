@@ -11,6 +11,7 @@
         "psr-7",
         "psr-11",
         "psr-12",
+        "psr-14",
         "psr-15",
         "basic",
         "application"
