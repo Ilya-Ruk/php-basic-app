@@ -9,23 +9,23 @@ use Rukavishnikov\Php\Basic\App\Application;
 use Rukavishnikov\Php\Basic\App\ApplicationInterface;
 use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
 use Rukavishnikov\Php\Basic\App\Databases\SQLiteDatabase;
-use Rukavishnikov\Php\Basic\App\Events\BookChangeEvent;
-use Rukavishnikov\Php\Basic\App\Events\BookChangeListener;
 use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
-use Rukavishnikov\Php\Basic\App\Handlers\Books\AddAction;
-use Rukavishnikov\Php\Basic\App\Handlers\Books\DeleteAction;
-use Rukavishnikov\Php\Basic\App\Handlers\Books\EditAction;
-use Rukavishnikov\Php\Basic\App\Handlers\Books\ListAction;
-use Rukavishnikov\Php\Basic\App\Handlers\Books\ViewAction;
-use Rukavishnikov\Php\Basic\App\Handlers\HelloAction;
 use Rukavishnikov\Php\Basic\App\Middlewares\AccessLoggerMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ApplicationJsonMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentLengthMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ContentTypeMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\ErrorHandlerMiddleware;
 use Rukavishnikov\Php\Basic\App\Middlewares\RouteDispatcherMiddleware;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\BookRepositoryInterface;
-use Rukavishnikov\Php\Basic\App\Repositories\Books\SQLiteBookRepository;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Events\BookChangeEvent;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Handlers\BookAddHandler;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Handlers\BookDeleteHandler;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Handlers\BookEditHandler;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Handlers\BookListHandler;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Handlers\BookViewHandler;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Listeners\BookChangeListener;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Repositories\BookRepositoryInterface;
+use Rukavishnikov\Php\Basic\App\Modules\Book\Repositories\SQLiteBookRepository;
+use Rukavishnikov\Php\Basic\App\Modules\Hello\Handlers\HelloHandler;
 use Rukavishnikov\Php\Emitter\Emitter;
 use Rukavishnikov\Php\Emitter\EmitterInterface;
 use Rukavishnikov\Php\Helper\Classes\FilePath;
@@ -116,13 +116,13 @@ return [
 
         '__construct()' => [
             [
-                new Route('GET', '/hello[/{name:[a-zA-Z][a-zA-Z-]*}][/{id:\d+}]', HelloAction::class),
+                new Route('GET', '/hello[/{name:[a-zA-Z][a-zA-Z-]*}][/{id:\d+}]', HelloHandler::class),
 
-                new Route('GET', '/books', ListAction::class),
-                new Route('GET', '/books/{id:\d+}', ViewAction::class),
-                new Route('POST', '/books/add', AddAction::class),
-                new Route('PUT', '/books/edit/{id:\d+}', EditAction::class),
-                new Route('DELETE', '/books/delete/{id:\d+}', DeleteAction::class),
+                new Route('GET', '/books', BookListHandler::class),
+                new Route('GET', '/books/{id:\d+}', BookViewHandler::class),
+                new Route('POST', '/books/add', BookAddHandler::class),
+                new Route('PUT', '/books/edit/{id:\d+}', BookEditHandler::class),
+                new Route('DELETE', '/books/delete/{id:\d+}', BookDeleteHandler::class),
             ],
         ],
     ],

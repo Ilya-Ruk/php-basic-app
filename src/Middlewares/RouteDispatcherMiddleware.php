@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Exceptions\MethodNotAllowedHttpException;
+use Rukavishnikov\Php\Basic\App\HttpExceptions\MethodNotAllowedHttpException;
 use Rukavishnikov\Php\Router\MethodNotAllowedException;
 use Rukavishnikov\Php\Router\RouteNotFoundException;
 use Rukavishnikov\Php\Router\RouterInterface;
