@@ -9,12 +9,12 @@ use Rukavishnikov\Php\Basic\App\Entities\Books\Book;
 final class BookChangeEvent
 {
     /**
-     * @param Book $oldBook
-     * @param Book $newBook
+     * @param Book|null $oldBook
+     * @param Book|null $newBook
      */
     public function __construct(
-        public Book $oldBook,
-        public Book $newBook,
+        public ?Book $oldBook,
+        public ?Book $newBook,
     ) {
     }
 }
