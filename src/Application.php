@@ -20,12 +20,12 @@ final class Application implements ApplicationInterface
     /**
      * @param ServerRequestInterface $request
      * @param EmitterInterface $emitter
-     * @param ApplicationNotFoundHandler $applicationNotFoundHandler
+     * @param RequestHandlerInterface $applicationNotFoundHandler
      */
     public function __construct(
         private ServerRequestInterface $request,
         private EmitterInterface $emitter,
-        private ApplicationNotFoundHandler $applicationNotFoundHandler,
+        private RequestHandlerInterface $applicationNotFoundHandler,
     ) {
     }
 

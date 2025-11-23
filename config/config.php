@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rukavishnikov\Php\Basic\App\Application;
 use Rukavishnikov\Php\Basic\App\ApplicationInterface;
+use Rukavishnikov\Php\Basic\App\ApplicationNotFoundHandler;
 use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
 use Rukavishnikov\Php\Basic\App\Databases\SQLiteDatabase;
 use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
@@ -47,6 +48,12 @@ $startDateTime = new DateTime();
 return [
     ApplicationInterface::class => [
         'class' => Application::class,
+
+        '__construct()' => [
+            ServerRequestInterface::class,
+            EmitterInterface::class,
+            ApplicationNotFoundHandler::class,
+        ],
 
         'setMiddlewareList()' => [
             static fn (ContainerInterface $container) => [
@@ -103,6 +110,7 @@ return [
 
         '__construct()' => [
             static fn () => new FilePath(__DIR__ . '/../runtime/logs/access.log', true),
+            FormatterInterface::class,
         ],
     ],
     RouteDispatcherMiddleware::class => [
@@ -110,6 +118,7 @@ return [
 
         '__construct()' => [
             static fn (ContainerInterface $container) => $container,
+            RouterInterface::class,
         ],
     ],
     RouterInterface::class => [
@@ -141,6 +150,7 @@ return [
 
         '__construct()' => [
             'BookChangeLogger',
+            ValueToStringHelper::class,
         ],
     ],
     'BookChangeLogger' => [
@@ -155,6 +165,7 @@ return [
 
         '__construct()' => [
             static fn () => new FilePath(__DIR__ . '/../runtime/logs/book_change.log', true),
+            FormatterInterface::class,
         ],
     ],
     FormatterInterface::class => [
@@ -163,6 +174,7 @@ return [
         '__construct()' => [
             ValueToStringHelper::class,
             $startDateTime,
+            //'Y-m-d H:i:s',
         ],
     ],
 ];
