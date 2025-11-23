@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Rukavishnikov\Php\Basic\App\Events\BookChangeEvent;
+use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
 use Rukavishnikov\Php\Basic\App\Exceptions\BadRequestHttpException;
 use Rukavishnikov\Php\Basic\App\Exceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Factories\Books\BookFactory;
@@ -22,11 +24,13 @@ final class AddAction implements RequestHandlerInterface
      * @param BookRepositoryInterface $bookRepository
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
+     * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         private BookRepositoryInterface $bookRepository,
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
+        private EventDispatcher $eventDispatcher,
     ) {
     }
 
@@ -38,19 +42,22 @@ final class AddAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         try {
-            $book = BookFactory::createFromRequestData($request->getParsedBody());
+            $newBook = BookFactory::createFromRequestData($request->getParsedBody());
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage(), 400, $e);
         }
 
         try {
             $nextId = $this->bookRepository->getNextId();
-            $bookWithId = $book->withId($nextId);
+            $newBookWithId = $newBook->withId($nextId);
 
-            $this->bookRepository->add($bookWithId);
+            $this->bookRepository->add($newBookWithId);
         } catch (BookGetNextIdException|BookAddException $e) {
             throw new InternalServerErrorHttpException('Book add error!', 500, $e);
         }
+
+        $bookChangeEvent = new BookChangeEvent(null, $newBookWithId);
+        $this->eventDispatcher->dispatch($bookChangeEvent);
 
         $data[$nextId] = "Book added!";
 
