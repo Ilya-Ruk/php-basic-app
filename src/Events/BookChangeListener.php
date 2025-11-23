@@ -25,14 +25,17 @@ final class BookChangeListener
      */
     public function __invoke(BookChangeEvent $event): void
     {
-        $oldBookAsArray = $event->oldBook->getAsArray();
-        $newBookAsArray = $event->newBook->getAsArray();
+        $oldBook = $event->oldBook;
+        $newBook = $event->newBook;
 
-        $message = "{oldData} {newData}\r\n";
+        $oldBookAsArray = is_null($oldBook) ? [] : $oldBook->getAsArray();
+        $newBookAsArray = is_null($newBook) ? [] : $newBook->getAsArray();
+
+        $message = "{oldBook} {newBook}\r\n";
 
         $context = [
-            'oldData' => $this->valueToStringHelper->valueToString($oldBookAsArray),
-            'newData' => $this->valueToStringHelper->valueToString($newBookAsArray),
+            'oldBook' => $this->valueToStringHelper->valueToString($oldBookAsArray),
+            'newBook' => $this->valueToStringHelper->valueToString($newBookAsArray),
         ];
 
         $this->logger->info($message, $context);
