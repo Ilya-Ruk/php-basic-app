@@ -1,4 +1,4 @@
-# Application template and use case
+# A PHP application template implemented [PSR](https://www.php-fig.org/psr/) (PHP Standards Recommendations)
 
 ## Installation
 
