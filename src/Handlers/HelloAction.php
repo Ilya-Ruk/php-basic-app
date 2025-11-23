@@ -34,12 +34,12 @@ final class HelloAction implements RequestHandlerInterface
         // Prepare response
 
         if (is_null($id)) {
-            $body = sprintf("Hello, %s!", $name);
+            $data = sprintf("Hello, %s!", $name);
         } else {
-            $body = sprintf("Hello, %s (%s)!", $name, $id);
+            $data = sprintf("Hello, %s (%s)!", $name, $id);
         }
 
-        $body = $this->jsonHelper->encode($body);
+        $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
 
         // Return response
