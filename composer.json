@@ -1,7 +1,7 @@
 {
     "name": "rukavishnikov/php-basic-app",
     "type": "project",
-    "description": "A PHP basic application implemented PSR (PHP Standards Recommendations)",
+    "description": "A PHP application template implemented PSR (PHP Standards Recommendations)",
     "keywords": [
         "php",
         "psr",
