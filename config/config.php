@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rukavishnikov\Php\Basic\App\Application;
@@ -126,7 +127,7 @@ return [
             ],
         ],
     ],
-    EventDispatcher::class => [
+    EventDispatcherInterface::class => [
         'class' => EventDispatcher::class,
 
         '__construct()' => [

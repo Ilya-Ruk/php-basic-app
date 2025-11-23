@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Rukavishnikov\Php\Basic\App\Modules\Book\Handlers;
 
 use InvalidArgumentException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
 use Rukavishnikov\Php\Basic\App\HttpExceptions\BadRequestHttpException;
 use Rukavishnikov\Php\Basic\App\HttpExceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\Modules\Book\Events\BookChangeEvent;
@@ -24,13 +24,13 @@ final class BookAddHandler implements RequestHandlerInterface
      * @param BookRepositoryInterface $bookRepository
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private BookRepositoryInterface $bookRepository,
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
-        private EventDispatcher $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

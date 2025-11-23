@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Rukavishnikov\Php\Basic\App\Modules\Book\Handlers;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
 use Rukavishnikov\Php\Basic\App\HttpExceptions\InternalServerErrorHttpException;
 use Rukavishnikov\Php\Basic\App\HttpExceptions\NotFoundHttpException;
 use Rukavishnikov\Php\Basic\App\Modules\Book\Events\BookChangeEvent;
@@ -23,13 +23,13 @@ final class BookDeleteHandler implements RequestHandlerInterface
      * @param BookRepositoryInterface $bookRepository
      * @param JsonHelper $jsonHelper
      * @param ResponseInterface $response
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private BookRepositoryInterface $bookRepository,
         private JsonHelper $jsonHelper,
         private ResponseInterface $response,
-        private EventDispatcher $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
