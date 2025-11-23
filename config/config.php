@@ -5,11 +5,13 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
 use Rukavishnikov\Php\Basic\App\Application;
 use Rukavishnikov\Php\Basic\App\ApplicationInterface;
 use Rukavishnikov\Php\Basic\App\Databases\DatabaseInterface;
 use Rukavishnikov\Php\Basic\App\Databases\SQLiteDatabase;
+use Rukavishnikov\Php\Basic\App\Events\BookChangeEvent;
+use Rukavishnikov\Php\Basic\App\Events\BookChangeListener;
+use Rukavishnikov\Php\Basic\App\Events\EventDispatcher;
 use Rukavishnikov\Php\Basic\App\Handlers\Books\AddAction;
 use Rukavishnikov\Php\Basic\App\Handlers\Books\DeleteAction;
 use Rukavishnikov\Php\Basic\App\Handlers\Books\EditAction;
@@ -38,7 +40,6 @@ use Rukavishnikov\Psr\Log\Formatter\DefaultFormatter;
 use Rukavishnikov\Psr\Log\Formatter\FormatterInterface;
 use Rukavishnikov\Psr\Log\Log;
 use Rukavishnikov\Psr\Log\LogTargetFile;
-use Rukavishnikov\Psr\Log\LogTargetInterface;
 
 $startDateTime = new DateTime();
 
@@ -82,6 +83,27 @@ return [
             (bool)getenv('X_TRACE', true),
         ],
     ],
+    AccessLoggerMiddleware::class => [
+        'class' => AccessLoggerMiddleware::class,
+
+        '__construct()' => [
+            'AccessLogger',
+        ],
+    ],
+    'AccessLogger' => [
+        'class' => Log::class,
+
+        '__construct()' => [
+            'AccessLogTarget',
+        ],
+    ],
+    'AccessLogTarget' => [
+        'class' => LogTargetFile::class,
+
+        '__construct()' => [
+            static fn () => new FilePath(__DIR__ . '/../runtime/logs/access.log', true),
+        ],
+    ],
     RouteDispatcherMiddleware::class => [
         'class' => RouteDispatcherMiddleware::class,
 
@@ -104,12 +126,34 @@ return [
             ],
         ],
     ],
-    LoggerInterface::class => Log::class,
-    LogTargetInterface::class => [
+    EventDispatcher::class => [
+        'class' => EventDispatcher::class,
+
+        '__construct()' => [
+            static fn (ContainerInterface $container) => [
+                BookChangeEvent::class => $container->get(BookChangeListener::class),
+            ],
+        ],
+    ],
+    BookChangeListener::class => [
+        'class' => BookChangeListener::class,
+
+        '__construct()' => [
+            'BookChangeLogger',
+        ],
+    ],
+    'BookChangeLogger' => [
+        'class' => Log::class,
+
+        '__construct()' => [
+            'BookChangeLogTarget',
+        ],
+    ],
+    'BookChangeLogTarget' => [
         'class' => LogTargetFile::class,
 
         '__construct()' => [
-            static fn () => new FilePath(__DIR__ . '/../runtime/logs/access.log', true),
+            static fn () => new FilePath(__DIR__ . '/../runtime/logs/book_change.log', true),
         ],
     ],
     FormatterInterface::class => [
