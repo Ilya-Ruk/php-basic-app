@@ -48,8 +48,8 @@ final class BookAddHandler implements RequestHandlerInterface
         }
 
         try {
-            $nextId = $this->bookRepository->getNextId();
-            $newBookWithId = $newBook->withId($nextId);
+            $newBookId = $this->bookRepository->getNextId();
+            $newBookWithId = $newBook->withId($newBookId);
 
             $this->bookRepository->add($newBookWithId);
         } catch (BookGetNextIdException|BookAddException $e) {
@@ -59,7 +59,7 @@ final class BookAddHandler implements RequestHandlerInterface
         $bookChangeEvent = new BookChangeEvent(null, $newBookWithId);
         $this->eventDispatcher->dispatch($bookChangeEvent);
 
-        $data[$nextId] = "Book added!";
+        $data[$newBookId] = "Book added!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

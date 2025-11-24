@@ -54,6 +54,8 @@ final class BookEditHandler implements RequestHandlerInterface
             throw new NotFoundHttpException(sprintf("Book with id %d not found!", $id), 404, $e);
         }
 
+        $oldBookId = $oldBook->getId()->getValue();
+
         try {
             $newBook = BookFactory::createFromRequestData($request->getParsedBody());
         } catch (InvalidArgumentException $e) {
@@ -61,15 +63,15 @@ final class BookEditHandler implements RequestHandlerInterface
         }
 
         try {
-            $this->bookRepository->edit($id, $newBook);
+            $this->bookRepository->edit($oldBookId, $newBook);
         } catch (BookEditException $e) {
-            throw new InternalServerErrorHttpException(sprintf("Book with id %d edit error!", $id), 500, $e);
+            throw new InternalServerErrorHttpException(sprintf("Book with id %d edit error!", $oldBookId), 500, $e);
         }
 
         $bookChangeEvent = new BookChangeEvent($oldBook, $newBook);
         $this->eventDispatcher->dispatch($bookChangeEvent);
 
-        $data[$id] = "Book edited!";
+        $data[$oldBookId] = "Book edited!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);

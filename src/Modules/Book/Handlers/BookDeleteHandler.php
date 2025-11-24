@@ -50,16 +50,18 @@ final class BookDeleteHandler implements RequestHandlerInterface
             throw new NotFoundHttpException(sprintf("Book with id %d not found!", $id), 404, $e);
         }
 
+        $oldBookId = $oldBook->getId()->getValue();
+
         try {
-            $this->bookRepository->delete($id);
+            $this->bookRepository->delete($oldBookId);
         } catch (BookDeleteException $e) {
-            throw new InternalServerErrorHttpException(sprintf("Book with id %d delete error!", $id), 500, $e);
+            throw new InternalServerErrorHttpException(sprintf("Book with id %d delete error!", $oldBookId), 500, $e);
         }
 
         $bookChangeEvent = new BookChangeEvent($oldBook, null);
         $this->eventDispatcher->dispatch($bookChangeEvent);
 
-        $data[$id] = "Book deleted!";
+        $data[$oldBookId] = "Book deleted!";
 
         $body = $this->jsonHelper->encode($data);
         $this->response->getBody()->write($body);
