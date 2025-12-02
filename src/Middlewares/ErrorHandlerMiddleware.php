@@ -58,7 +58,7 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
 
                 $errorLevel = 1;
 
-                while ($previousError !== null) {
+                while (!is_null($previousError)) {
                     $data['previousError'][$errorLevel] = [
                         'code' => $previousError->getCode(),
                         'message' => $previousError->getMessage(),
@@ -80,7 +80,7 @@ final class ErrorHandlerMiddleware implements MiddlewareInterface
                     'message' => $e->getMessage(),
                 ];
             } else {
-                $data = "Internal server error!";
+                $data = 'Internal server error!';
             }
 
             $body = $this->jsonHelper->encode($data);
