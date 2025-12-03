@@ -11,7 +11,7 @@ composer update
 ## Start PHP built-in web server
 
 ```
-php -S basic.local:80 -t "./web"
+php -S basic.local:80 -t public
 ```
 
 ## Usage
